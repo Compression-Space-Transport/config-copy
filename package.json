@@ -1,5 +1,5 @@
 {
-  "name": "config-copy",
+  "name": "s3-file-sync",
   "version": "1.0.0",
   "main": "index.js",
   "author": "William Rory Kronmiller <wrk961@gmail.com>",

@@ -7,7 +7,7 @@ import ChangeTracker from './change-tracker';
 const changeTracker = new ChangeTracker();
 
 const serviceMappings = [
-	{ prefix: '/etc/sysconfig/network-scripts', service: 'network' },
+	{ prefix: '/etc/sysconfig/network-scripts', service: 'network', dependencies: ['dhcpd'], },
 	{ prefix: '/etc/sysconfig/iptables', service: 'iptables' },
 	{ prefix: '/etc/dhcp', service: 'dhcpd' },
 ];
@@ -20,9 +20,12 @@ async function updateServer() {
 	}
 	const { key, receiptHandle } = message;
 	const { localPath } = await loadDesiredConfig({ key });
-	const [{ service }] = serviceMappings.filter(({ prefix }) => localPath.indexOf(prefix) === 0);
+	const [{ service, dependencies }] = serviceMappings.filter(({ prefix }) => localPath.indexOf(prefix) === 0);
 	console.log('updating service', service);
 	await systemctl.restart(service);
+	if(dependencies) {
+		await Promise.all(dependencies.map(service => systemctl.restart(service)));
+	}
 	await changeTracker.deleteMessage({ receiptHandle });
 	console.log('updated service', service);
 	return { updated: true, service };
