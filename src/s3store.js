@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 import fs from 'fs';
 import { promisifyCb } from './utils';
 
-const BucketName = 'compression-space-transport';
+const Bucket = 'compression-space-transport';
 export const DesiredConfigPrefix = 'desired-configs';
 const BackupPrefix = 'config-backups';
 
@@ -10,7 +10,7 @@ const s3 = new AWS.S3();
 
 async function listRemoteFiles({ prefix }) {
 	const params = {
-		Bucket: BucketName,
+		Bucket,
 		Prefix: prefix,
 	};
 
@@ -25,7 +25,7 @@ async function remoteFileExists({ path }) {
 
 async function loadRemoteFile({ key }) {
 	const params = {
-		Bucket: BucketName,
+		Bucket,
 		Key: key,
 	};
 	const { Body } = await promisifyCb(params, s3.getObject.bind(s3));
@@ -34,7 +34,7 @@ async function loadRemoteFile({ key }) {
 
 export async function uploadRemoteFile({ path, body }) {
 	const params = {
-		Bucket: BucketName,
+		Bucket,
 		Key: path,
 		Body: body,
 	};
