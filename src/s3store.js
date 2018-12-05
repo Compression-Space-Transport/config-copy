@@ -47,15 +47,15 @@ export async function uploadRemoteFile({ path, body }) {
 async function backupLocalFile({ localPath }) {
 	const body = fs.readFileSync(localPath);
 	const path = `${BackupPrefix}/${localPath}`.replace('//', '/');
-	return uploadRemoteFile({ path, body });
+	await uploadRemoteFile({ path, body });
+	return { body };
 }
 
 export async function loadDesiredConfig({ key }) {
 	const data = await loadRemoteFile({ key });
 	const localPath = key.replace(DesiredConfigPrefix, '');
-	await backupLocalFile({ localPath });
+	const { body: oldConfig } = await backupLocalFile({ localPath });
 	fs.writeFileSync(localPath, data);
-	return { localPath };
+	return { localPath, oldConfig };
 }
-
 
